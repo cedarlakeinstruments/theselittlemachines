@@ -78,9 +78,14 @@ const int SLOW_MS = 8;
 const int MEDIUM_MS = 6;
 const int FAST_MS = 2;
 
+// Timeout after last ball in collection area
+const int TIMEOUT_MS = 5000;
+
 // LED blink speed
 const int BLINK_SPEED = 250;
 // ***********************************************************************************
+
+enum BALL_STATES {IDLE, CHECKING, DONE};
 
 class BallState
 {
@@ -222,30 +227,48 @@ void loop()
     const int FIRST_PIN = 2;
     byte balls = PIND & BALL_MASK;
 
-    //delay(500);
-    //sprintf(buffer,"balls 0x%x",balls);
-    //Serial.println(buffer);
+    static BALL_STATES state = IDLE;
+    static unsigned long doneTime = 0;
     
-    // Disable speed measurement 5 seconds after last ball detected
-    if (digitalRead(LAST_BALL) == HIGH)
+    switch (state)
     {
-        // Balls still in collection area
-        //return;
-    }
-    
-    // Figure out which bit changed. Stop after the first one
-    for (int i = 0; i < 5; i++)
-    {            
-        bool v = (1 << (i+FIRST_PIN)) & balls;
-        if (_balls[i].update(v, millis()))
-        {
-            celebrate(i);
-            break;
-        }
-    }   
-
-    // Monitor the ball storage and reset everyone once the balls are gone
-    
+        case IDLE:
+          if (digitalRead(LAST_BALL) == LOW)
+          {
+              // All balls on table
+              state = CHECKING;
+              Serial.println("All balls on table");
+          }
+          break;
+        case CHECKING:       
+          // Figure out which bit changed. Stop after the first one
+          for (int i = 0; i < 5; i++)
+          {            
+              bool v = (1 << (i+FIRST_PIN)) & balls;
+              if (_balls[i].update(v, millis()))
+              {
+                  celebrate(i);
+                  break;
+              }
+          }   
+          // Disable speed measurement 5 seconds after last ball detected
+          if (digitalRead(LAST_BALL) == HIGH)
+          {
+              // All balls in collection area
+              Serial.println("All balls collected");
+              doneTime = millis() + TIMEOUT_MS;
+              state = DONE;
+          }
+          break;
+        case DONE:              
+          // Monitor the ball storage and reset everyone once the balls are gone
+          if (millis() > doneTime)
+          {
+             Serial.println("Returning to idle state");
+             state = IDLE;
+          }
+          break;
+    }    
 }
 
 // Flash LEDs and play sound for this pocket
