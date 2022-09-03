@@ -38,7 +38,6 @@
 >  Of course, we can control the length of time or pulse as desired
  */
  
-#include <DFRobot_DF1201S.h>
 #include <SoftwareSerial.h>
 
 // I/O Connections:
@@ -48,7 +47,7 @@
 // Pin 9: LED output (needs drive transistor)
 // Pin 10,11 - DF Robot triggers
 
-#define LED_PIN LED_BUILTIN
+#define LED_PIN 9
 
 #define ACTIVE 0
 #define INACTIVE 1
@@ -64,8 +63,17 @@ byte _pulseCount = 0;
 byte _threadPulseCount = 0;
 
 char buffer[50];
-SoftwareSerial DF1201SSerial(10, 11);  //RX  TX
-DFRobot_DF1201S DF1201S;
+SoftwareSerial DfPlayerSerial(10, 11);  //RX  TX
+
+#define PLAYER_MINI
+
+#ifdef PLAYER_PRO
+ #include <DFRobot_DF1201S.h>
+ DFRobot_DF1201S DfPlayer;
+#else
+ #include "DFRobotDFPlayerMini.h"
+ DFRobotDFPlayerMini DfPlayer;
+#endif
 
 //***************************************** USER SETUP *****************************
 // Number of LED flashes
@@ -174,51 +182,71 @@ void setup()
     // Enable internal pullups
     PORTD = BALL_MASK;   
 
-    // Setup DFr
+    // Setup output pins last
+    pinMode(LED_PIN, OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
+    
+    // Setup DF Robot Player
     Serial.println("Start Audio Player setup");
-    DF1201SSerial.begin(115200);
-    bool df1201Ready = false;
+    
+#ifdef PLAYER_PRO
+    DfPlayerSerial.begin(115200);
+#else
+    DfPlayerSerial.begin(9600);
+#endif
+
+    bool dfPlayerReady = false;
+    Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));
     for (int i=0; i < 5; i++)
-    {   if (DF1201S.begin(DF1201SSerial))
+    {   if (DfPlayer.begin(DfPlayerSerial))
         {
-            df1201Ready = true;
+            dfPlayerReady = true;
             break;
         }
-        Serial.println("DF1201 failed, please check the wire connection!");
+        Serial.println("DFPlayer failed, please check the wire connection!");
         delay(1000);
     }
     
-    if (df1201Ready)
+    if (dfPlayerReady)
     {
-        Serial.println("DF1201 connected");
+        Serial.println("DF Player connected");
     }
     
     delay(100);
+#ifdef PLAYER_PRO
     /*Set volume to 20*/
-    DF1201S.setVol(20);
+    DfPlayer.setVol(20);
     delay(100);
     
     /*Enter music mode*/
-    DF1201S.switchFunction(DF1201S.MUSIC);
+    DfPlayer.switchFunction(DfPlayer.MUSIC);
     // Wait for prompt to stop
     delay(2000);
     
     //Turn off the prompt tone (Power-down save) 
-    DF1201S.setPrompt(false);
+    DfPlayer.setPrompt(false);
     delay(100);
     
-    DF1201S.setPlayMode(DF1201S.SINGLE);
+    DfPlayer.setPlayMode(DfPlayer.SINGLE);
     delay(100);
     
     //Enable amplifier chip 
-    DF1201S.enableAMP();
+    DfPlayer.enableAMP();
     delay(100);
   
     Serial.print("The number of files available to play:");
     //The number of files available to play
-    Serial.println(DF1201S.getTotalFile());
+    Serial.println(DfPlayer.getTotalFile());
   
     Serial.println("DF1201 configured");
+#else
+    /*Set volume to 20*/
+    DfPlayer.volume(20);
+    delay(100);
+    Serial.print("The number of files available to play: ");
+    Serial.println(DfPlayer.readFileCounts());
+    Serial.println("DF Player Mini configured");
+#endif
     Serial.println("BallSpeed 1.0 ready");
 }
     
@@ -284,13 +312,22 @@ void celebrate(int pocket)
     if (index < 3)
     {
         Serial.print("Playing ");Serial.println(files[index]);
-        DF1201S.playSpecFile(files[index]);        
-        
+
+#ifdef PLAYER_PRO
+        DfPlayer.playSpecFile(files[index]);        
+#else
+        DfPlayer.play(index+1);
+#endif
         for (int i = 0; i < flashes[index]; i++)
         {
             digitalWrite(LED_PIN, HIGH);
+            digitalWrite(LED_BUILTIN, HIGH);
+            
             delay(BLINK_SPEED);
+            
             digitalWrite(LED_PIN, LOW);
+            digitalWrite(LED_BUILTIN, LOW);
+            
             delay(BLINK_SPEED);        
         }
     }
