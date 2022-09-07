@@ -45,7 +45,8 @@
 // Pin 2 - 7: ball sensor input
 // Pin 8: ball tray empty
 // Pin 9: LED output (needs drive transistor)
-// Pin 10,11 - DF Robot triggers
+// Pin 10: DF Robot Player TX
+// Pin 11: DF Robot Player RX
 
 #define LED_PIN 9
 
@@ -81,7 +82,10 @@ const int FLASH_COUNT_SLOW = 2;
 const int FLASH_COUNT_MEDIUM = 4;
 const int FLASH_COUNT_FAST = 8;
 
-// Times to cross sensor at various speeds
+// LED flash speed
+const int BLINK_SPEED = 250;
+
+// Times to cross sensor at various speeds (Set time to -1 if not used. e.g., to ignore MEDIUM speed set MEDIUM_MS = -1)
 const int SLOW_MS = 8;
 const int MEDIUM_MS = 6;
 const int FAST_MS = 2;
@@ -89,8 +93,8 @@ const int FAST_MS = 2;
 // Timeout after last ball in collection area
 const int TIMEOUT_MS = 5000;
 
-// LED blink speed
-const int BLINK_SPEED = 250;
+// Audio volume
+const int VOLUME = 20;
 // ***********************************************************************************
 
 enum BALL_STATES {IDLE, CHECKING, DONE};
@@ -215,7 +219,7 @@ void setup()
     delay(100);
 #ifdef PLAYER_PRO
     /*Set volume to 20*/
-    DfPlayer.setVol(20);
+    DfPlayer.setVol(VOLUME);
     delay(100);
     
     /*Enter music mode*/
@@ -241,13 +245,13 @@ void setup()
     Serial.println("DF1201 configured");
 #else
     /*Set volume to 20*/
-    DfPlayer.volume(20);
+    DfPlayer.volume(VOLUME);
     delay(100);
     Serial.print("The number of files available to play: ");
     Serial.println(DfPlayer.readFileCounts());
     Serial.println("DF Player Mini configured");
 #endif
-    Serial.println("BallSpeed 1.0 ready");
+    Serial.println("BallSpeed 1.1 ready");
 }
     
 void loop() 
@@ -309,7 +313,7 @@ void celebrate(int pocket)
     const int flashes[] = {FLASH_COUNT_FAST, FLASH_COUNT_MEDIUM,FLASH_COUNT_SLOW};
 
     int index = flashCountIndex(_balls[pocket].transitionTime);
-    if (index < 3)
+    if ((index < 3) && (index >= 0))
     {
         Serial.print("Playing ");Serial.println(files[index]);
 
@@ -350,9 +354,14 @@ int flashCountIndex(int time)
         Serial.println("Medium");
         return 1;
     }
-    else
+    else if (time <= SLOW_MS)
     {
         Serial.println("Slow");
         return 2;
+    }
+    else
+    {
+        Serial.println("Very long time");
+        return -1;
     }
 }
