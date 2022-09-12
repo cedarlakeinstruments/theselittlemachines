@@ -36,6 +36,14 @@
 >  the MP3 audio Voice I have Of course we will use a memory card,
 >
 >  Of course, we can control the length of time or pulse as desired
+
+// v1.2 adds:
+>  all The 6 Sensors Except Pin 8 Need To be disabled Exactly after the
+> ball fell in the slot & Activate after 5 Seconds Of course I can
+> increase it later, 
+> 
+>  The point of this
+> I don't want to repeat the light and sound constantly
  */
  
 #include <SoftwareSerial.h>
@@ -83,7 +91,9 @@ const int FLASH_COUNT_MEDIUM = 4;
 const int FLASH_COUNT_FAST = 8;
 
 // LED flash speed
-const int BLINK_SPEED = 250;
+const int FLASH_FAST = 200;
+const int FLASH_MEDIUM = 250;
+const int FLASH_SLOW = 300;
 
 // Times to cross sensor at various speeds (Set time to -1 if not used. e.g., to ignore MEDIUM speed set MEDIUM_MS = -1)
 const int SLOW_MS = 8;
@@ -92,6 +102,9 @@ const int FAST_MS = 2;
 
 // Timeout after last ball in collection area
 const int TIMEOUT_MS = 5000;
+
+// Delay further detection after ball detected
+const int BALL_SENSOR_DELAY = 5000;
 
 // Audio volume
 const int VOLUME = 20;
@@ -251,7 +264,7 @@ void setup()
     Serial.println(DfPlayer.readFileCounts());
     Serial.println("DF Player Mini configured");
 #endif
-    Serial.println("BallSpeed 1.1 ready");
+    Serial.println("BallSpeed 1.2 ready");
 }
     
 void loop() 
@@ -280,6 +293,7 @@ void loop()
               if (_balls[i].update(v, millis()))
               {
                   celebrate(i);
+                  delay(BALL_SENSOR_DELAY);
                   break;
               }
           }   
@@ -311,7 +325,8 @@ void celebrate(int pocket)
 
     const String files[] = {"/fast.mp3", "/medium.mp3", "/slow.mp3"};
     const int flashes[] = {FLASH_COUNT_FAST, FLASH_COUNT_MEDIUM,FLASH_COUNT_SLOW};
-
+    const int flashDelay[] {FLASH_FAST, FLASH_MEDIUM, FLASH_SLOW};
+    
     int index = flashCountIndex(_balls[pocket].transitionTime);
     if ((index < 3) && (index >= 0))
     {
@@ -327,12 +342,12 @@ void celebrate(int pocket)
             digitalWrite(LED_PIN, HIGH);
             digitalWrite(LED_BUILTIN, HIGH);
             
-            delay(BLINK_SPEED);
+            delay(flashDelay[index]);
             
             digitalWrite(LED_PIN, LOW);
             digitalWrite(LED_BUILTIN, LOW);
             
-            delay(BLINK_SPEED);        
+            delay(flashDelay[index]);        
         }
     }
     else
