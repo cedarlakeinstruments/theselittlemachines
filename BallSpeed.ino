@@ -76,16 +76,17 @@
 // Pin 9: LED output (needs drive transistor)
 // Pin 10: DF Robot Player TX
 // Pin 11: DF Robot Player RX
-// Pin 12: White cue ball detect
-// Pin 14: Cue ball relay output
+// Pin 12: White cue ball detect (1-6) locations
+// Pin 14: Additional cue ball detect (7) 
+// Pin 15: Cue ball relay output
+// Pin 16: IR sensor input
 
 #define LED_PIN 9
 #define CUE_BALL_ENTER_PIN 12
 #define CUE_BALL_EXIT_PIN 14
 #define CUE_BALL_RELAY_PIN 15
+#define IR_SENSOR_PIN 16
 
-#define ACTIVE 0
-#define INACTIVE 1
 // ON and OFF time for RELAY
 #define PULSE_ON_TIME 500
 #define PULSE_OFF_TIME 100
@@ -136,7 +137,8 @@ const int BALL_SENSOR_DELAY = 5000;
 const int VOLUME = 20;
 
 // Sensor ignore time after cue ball detected
-const int CUE_BALL_DELAY_MS = 1000;
+const int CUE_BALL_DELAY_MS = 500;
+
 // Relay on time after cue ball exit trigger
 const int RELAY_ACTIVE_MS = 2000;
 
@@ -239,6 +241,7 @@ void setup()
     pinMode(CUE_BALL_ENTER_PIN, INPUT_PULLUP);
     pinMode(CUE_BALL_EXIT_PIN, INPUT_PULLUP);
     pinMode(CUE_BALL_RELAY_PIN, OUTPUT);
+    pinMode(IR_SENSOR_PIN, INPUT_PULLUP);
     
     // Configure pins D2-D7 as inputs
     DDRD = 0;
@@ -311,7 +314,7 @@ void setup()
     Serial.println(DfPlayer.readFileCounts());
     Serial.println("DF Player Mini configured");
 #endif
-    Serial.println("BallSpeed 1.2 ready");
+    Serial.println("BallSpeed 1.3 ready");
 }
     
 void loop() 
@@ -373,13 +376,24 @@ void checkRelay()
     static bool savedState = false;
     static unsigned long releaseTime;    
     unsigned long timeNow = millis();
+    bool cueExit = digitalRead(CUE_BALL_EXIT_PIN);
+    bool irDetect = digitalRead(IR_SENSOR_PIN);
+
+    if (cueExit)
+    {
+        Serial.println("Cue ball exit (7) detected");      
+    }
+
+    if (irDetect)
+    {
+      Serial.println("IR sensor detected");
+    }
     
-    if (digitalRead(CUE_BALL_EXIT_PIN) && (savedState == false) )
+    if ( (cueExit || irDetect) && (savedState == false) )
     {
         savedState = true;
         digitalWrite(CUE_BALL_RELAY_PIN, ACTIVE);
         releaseTime = timeNow + RELAY_ACTIVE_MS;
-        Serial.println("Cue ball exit detected");
     }
     else if (savedState)
     {
