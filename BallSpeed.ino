@@ -44,7 +44,28 @@
 > 
 >  The point of this
 > I don't want to repeat the light and sound constantly
- */
+
+  v1.3 adds:
+>>  I will install a sensor that detects the white ball at each ball
+>> entrance
+>>
+>>  When the white ball enters, the speed sensor stops for a part of a
+>> second, or as required
+>>
+>>  In this case, it is not encouraged when the white ball falls
+>>
+>>  And I will install an additional sensor that will operate a relay
+>> when the white ball passes
+>>
+>>  so Now The number of 6 entrances when the white ball is detected
+> Will
+>> disables the system for parts of a second
+>>The 7 white ball sensors connected to a separate common Arduino
+> input pin
+>
+>  So that, when this 7 sensor is activated, the separate output relay
+> works for a specific time, for example, a second or more
+*/
  
 #include <SoftwareSerial.h>
 
@@ -55,8 +76,13 @@
 // Pin 9: LED output (needs drive transistor)
 // Pin 10: DF Robot Player TX
 // Pin 11: DF Robot Player RX
+// Pin 12: White cue ball detect
+// Pin 14: Cue ball relay output
 
 #define LED_PIN 9
+#define CUE_BALL_ENTER_PIN 12
+#define CUE_BALL_EXIT_PIN 14
+#define CUE_BALL_RELAY_PIN 15
 
 #define ACTIVE 0
 #define INACTIVE 1
@@ -108,6 +134,15 @@ const int BALL_SENSOR_DELAY = 5000;
 
 // Audio volume
 const int VOLUME = 20;
+
+// Sensor ignore time after cue ball detected
+const int CUE_BALL_DELAY_MS = 1000;
+// Relay on time after cue ball exit trigger
+const int RELAY_ACTIVE_MS = 2000;
+
+// Relay states
+#define ACTIVE LOW
+#define INACTIVE HIGH
 // ***********************************************************************************
 
 enum BALL_STATES {IDLE, CHECKING, DONE};
@@ -135,6 +170,15 @@ public:
     bool update(bool sensorState, unsigned long timeNow)
     {
         bool retVal = false;
+
+        // Pause if cue ball detected
+        if (digitalRead(CUE_BALL_ENTER_PIN) == HIGH) 
+        {
+            Serial.println("Cue ball enter detected");
+            delay(CUE_BALL_DELAY_MS);
+            return false;
+        }
+                  
         switch(currentState)
         {
             case Idle:
@@ -192,6 +236,9 @@ void setup()
 
     // Pin configuration
     pinMode(LAST_BALL, INPUT_PULLUP);
+    pinMode(CUE_BALL_ENTER_PIN, INPUT_PULLUP);
+    pinMode(CUE_BALL_EXIT_PIN, INPUT_PULLUP);
+    pinMode(CUE_BALL_RELAY_PIN, OUTPUT);
     
     // Configure pins D2-D7 as inputs
     DDRD = 0;
@@ -298,13 +345,14 @@ void loop()
               }
           }   
           // Disable speed measurement 5 seconds after last ball detected
-          if (digitalRead(LAST_BALL) == HIGH)
+          if ( digitalRead(LAST_BALL) == HIGH)
           {
               // All balls in collection area
               Serial.println("All balls collected");
               doneTime = millis() + TIMEOUT_MS;
               state = DONE;
           }
+
           break;
         case DONE:              
           // Monitor the ball storage and reset everyone once the balls are gone
@@ -314,6 +362,33 @@ void loop()
              state = IDLE;
           }
           break;
+    }  
+    // Service relay
+    checkRelay();  
+}
+
+// Check cue ball exit and activate relay if triggered
+void checkRelay()
+{
+    static bool savedState = false;
+    static unsigned long releaseTime;    
+    unsigned long timeNow = millis();
+    
+    if (digitalRead(CUE_BALL_EXIT_PIN) && (savedState == false) )
+    {
+        savedState = true;
+        digitalWrite(CUE_BALL_RELAY_PIN, ACTIVE);
+        releaseTime = timeNow + RELAY_ACTIVE_MS;
+        Serial.println("Cue ball exit detected");
+    }
+    else if (savedState)
+    {
+       if (timeNow > releaseTime)
+       {
+          savedState = false;
+          digitalWrite(CUE_BALL_RELAY_PIN, INACTIVE);
+          Serial.println("Relay deactivated");
+       }
     }    
 }
 
