@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////; i++)//////////////////////////////////////////////////
 // Project sponsor: Mutea Sabir
 // Email: mutea_sabir@hotmail.com
 // Creator: Cedar Lake Instruments LLC
@@ -77,9 +77,9 @@
 // Pin 10: DF Robot Player TX
 // Pin 11: DF Robot Player RX
 // Pin 12: White cue ball detect (1-6) locations
-// Pin 14: Additional cue ball detect (7) 
-// Pin 15: Cue ball relay output
-// Pin 16: IR sensor input
+// Pin 14: Additional cue ball detect (7) (A0)
+// Pin 15: Cue ball relay output (A1)
+// Pin 16: IR sensor input (A2)
 
 #define LED_PIN 9
 #define CUE_BALL_ENTER_PIN 12
@@ -94,7 +94,7 @@
 #define LAST_BALL 8
 
 #define BUF_SIZE 40
-//static struct pt _pt1;
+
 byte _pulseCount = 0;
 byte _threadPulseCount = 0;
 
@@ -143,8 +143,14 @@ const int CUE_BALL_DELAY_MS = 500;
 const int RELAY_ACTIVE_MS = 2000;
 
 // Relay states
-#define ACTIVE LOW
-#define INACTIVE HIGH
+#define RELAY_ACTIVE LOW
+#define RELAY_INACTIVE HIGH
+
+// Sensor states
+#define IR_SENSOR_ACTIVE LOW
+#define LASER_SENSOR_ACTIVE LOW
+
+#define LASER_SETTLE_TIME_MS 50
 // ***********************************************************************************
 
 enum BALL_STATES {IDLE, CHECKING, DONE};
@@ -174,10 +180,12 @@ public:
         bool retVal = false;
 
         // Pause if cue ball detected
-        if (digitalRead(CUE_BALL_ENTER_PIN) == HIGH) 
+        if (digitalRead(CUE_BALL_ENTER_PIN) == LASER_SENSOR_ACTIVE) 
         {
             Serial.println("Cue ball enter detected");
             delay(CUE_BALL_DELAY_MS);
+            // Reset any measurement
+            reset();
             return false;
         }
                   
@@ -205,6 +213,7 @@ public:
                     {
                         // Taking too long to cross sensor
                         reset();
+                        //Serial.println("Crossing timeout");
                         currentState = Idle;
                     }
                 }
@@ -218,6 +227,7 @@ public:
 
     // Time it took ball to cross sensor
     int transitionTime = 0;
+    static constexpr int nBalls = 6;
     
 private:
     unsigned long leadingEdgeTime = 0;
@@ -227,7 +237,7 @@ private:
     States currentState;    
 };
 
-BallState _balls[6];
+BallState _balls[BallState::nBalls];
 
 //**********************************************************************************
 
@@ -314,7 +324,7 @@ void setup()
     Serial.println(DfPlayer.readFileCounts());
     Serial.println("DF Player Mini configured");
 #endif
-    Serial.println("BallSpeed 1.3 ready");
+    Serial.println("BallSpeed 1.4 ready");
 }
     
 void loop() 
@@ -324,7 +334,8 @@ void loop()
 
     static BALL_STATES state = IDLE;
     static unsigned long doneTime = 0;
-    
+
+    //Serial.println(balls, BIN);
     switch (state)
     {
         case IDLE:
@@ -337,7 +348,7 @@ void loop()
           break;
         case CHECKING:       
           // Figure out which bit changed. Stop after the first one
-          for (int i = 0; i < 5; i++)
+          for (int i = 0; i < BallState::nBalls; i++)
           {            
               bool v = (1 << (i+FIRST_PIN)) & balls;
               if (_balls[i].update(v, millis()))
@@ -376,8 +387,8 @@ void checkRelay()
     static bool savedState = false;
     static unsigned long releaseTime;    
     unsigned long timeNow = millis();
-    bool cueExit = digitalRead(CUE_BALL_EXIT_PIN);
-    bool irDetect = digitalRead(IR_SENSOR_PIN);
+    bool cueExit = digitalRead(CUE_BALL_EXIT_PIN) == LASER_SENSOR_ACTIVE;
+    bool irDetect = digitalRead(IR_SENSOR_PIN) == IR_SENSOR_ACTIVE;
 
     if (cueExit)
     {
@@ -392,15 +403,16 @@ void checkRelay()
     if ( (cueExit || irDetect) && (savedState == false) )
     {
         savedState = true;
-        digitalWrite(CUE_BALL_RELAY_PIN, ACTIVE);
+        digitalWrite(CUE_BALL_RELAY_PIN, RELAY_ACTIVE);
         releaseTime = timeNow + RELAY_ACTIVE_MS;
+        delay(LASER_SETTLE_TIME_MS);
     }
     else if (savedState)
     {
        if (timeNow > releaseTime)
        {
           savedState = false;
-          digitalWrite(CUE_BALL_RELAY_PIN, INACTIVE);
+          digitalWrite(CUE_BALL_RELAY_PIN, RELAY_INACTIVE);
           Serial.println("Relay deactivated");
        }
     }    
