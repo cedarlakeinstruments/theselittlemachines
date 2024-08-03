@@ -5,7 +5,7 @@ So, does this work?
 myCode();
 ~~~
 
-[![test](https://doimages.nyc3.cdn.digitaloceanspaces.com/002Blog/0-BLOG-BANNERS/app_platform.png)]
+![test](https://doimages.nyc3.cdn.digitaloceanspaces.com/002Blog/0-BLOG-BANNERS/app_platform.png)
 
 ---
 
