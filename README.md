@@ -2,7 +2,7 @@
 Simple digital thermometer simulator based on Raspberry Pi Pico and
 an OLED. Of course, it's in Python ;-)
 
-![Thermometer](\_images/therm1.jpg)
+![Thermometer](images/therm1.jpg)
 
 ~~~
 # Code designed for Raspberry Pi Pico running CircuitPython 8.2
