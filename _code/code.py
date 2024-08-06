@@ -1,10 +1,3 @@
-# Thermometer simulator
-Simple digital thermometer simulator based on Raspberry Pi Pico and
-an OLED. Of course, it's in Python ;-)
-
-![Thermometer](_images/therm1.jpg)
-
-~~~
 # Code designed for Raspberry Pi Pico running CircuitPython 8.2
 # Simulates a digital thermometer using an OLED for display
 
@@ -61,14 +54,3 @@ while True:
     temp_label.text = f"Temp {temp:.1f}C"
     time.sleep(2)
     temp += 0.1
-~~~
-
----
-
-# theselittlemachines
-BallSpeed project
-This project measures the speed of a ball and takes actions depending on how fast it's going.
-
-![custom audio player with LED dot matrix](Chevelle-audio.jpg)
-
----
