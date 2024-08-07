@@ -12,15 +12,7 @@ import displayio
 import terminalio
 import adafruit_displayio_ssd1306 as ssd1306
 from adafruit_display_text import label
-
-# Compatibility with both CircuitPython 8.x.x and 9.x.x.
-# Remove after 8.x.x is no longer a supported release.
-try:
-    from i2cdisplaybus import I2CDisplayBus
-    print ("Imported from i2cdisplaybus")
-except ImportError:
-    from displayio import I2CDisplay as I2CDisplayBus
-    print ("Imported from displayio")
+from i2cdisplaybus import I2CDisplayBus
     
 # Reinitalizes display upon any soft reboot or hard reset
 displayio.release_displays()

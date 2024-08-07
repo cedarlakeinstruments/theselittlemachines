@@ -5,7 +5,7 @@ a Sparkfun SSD1306-type OLED connected via I2C. Of course, the code's written in
 
 You can download it [here](code/code.py)
 
-![Thermometer](images/therm1.jpg)
+![Thermometer](images/therm2.jpg)
 
 The desire is to display a temperature that is adjustable in 0.1 degree increments by pushbuttons. The pushbuttons are connected between Ground and GP7 & GP8.
 At least, that was the intent. However, my ham-fisted soldering connected the common to GP9 instead of GND.
