@@ -113,9 +113,8 @@ while True:
 
 ---
 
-# [theselittlemachines](https://github.com/cedarlakeinstruments/theselittlemachines/edit/main/README.md#theselittlemachines)
-(home is BallSpeed project)
-This project measures the speed of a ball and takes actions depending on how fast it's going.
+# [ballSpeed](https://github.com/cedarlakeinstruments/theselittlemachines/edit/main/README.md#ball-speed)
+This project measures the speed of a ball and takes actions depending on how fast it's going. It plays audio feedback depending on the speed of the ball.
 
 ![custom audio player with LED dot matrix](images/Chevelle-audio.jpg)
 
