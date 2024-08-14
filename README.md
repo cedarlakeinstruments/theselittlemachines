@@ -122,3 +122,14 @@ This image has nothing to do with the Ball Speed project!
 ![custom audio player with LED dot matrix](images/Chevelle-audio.jpg)
 
 ---
+layout: default
+modal-id: 1
+date: 2020-01-18
+img: therm1.jpg
+alt: image-alt
+project-date: August 2024
+client: The Client
+category: Web Development
+description: Test post
+
+---
