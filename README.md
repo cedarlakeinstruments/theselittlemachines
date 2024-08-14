@@ -113,23 +113,17 @@ while True:
 
 ---
 
-# ballSpeed
+[Ball Speed Project](#ballSpeed)
+
 This project measures the speed of a ball and takes actions depending on how fast it's going. It plays audio feedback depending on the speed of the ball.
 Code is [here](BallSpeed/BallSpeed.ino)
 
-This image has nothing to do with the Ball Speed project!
-
-![custom audio player with LED dot matrix](images/Chevelle-audio.jpg)
 
 ---
-layout: default
-modal-id: 1
-date: 2020-01-18
-img: therm1.jpg
-alt: image-alt
-project-date: August 2024
-client: The Client
-category: Web Development
-description: Test post
+[frist post](#frist-post)
 
+test
+This image has nothing to do with anything!
+
+![custom audio player with LED dot matrix](images/Chevelle-audio.jpg)
 ---
