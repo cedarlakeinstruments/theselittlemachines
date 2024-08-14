@@ -113,7 +113,7 @@ while True:
 
 ---
 
-# [ballSpeed](https://github.com/cedarlakeinstruments/theselittlemachines/edit/main/README.md#ball-speed)
+# ballSpeed
 This project measures the speed of a ball and takes actions depending on how fast it's going. It plays audio feedback depending on the speed of the ball.
 Code is [here](BallSpeed/BallSpeed.ino)
 
