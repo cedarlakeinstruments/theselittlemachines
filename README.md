@@ -113,17 +113,23 @@ while True:
 
 ---
 
-[Ball Speed Project](#ballSpeed)
+## [Ball Speed Project](https://github.com/cedarlakeinstruments/theselittlemachines/edit/main/README.md#ballSpeed)
 
 This project measures the speed of a ball and takes actions depending on how fast it's going. It plays audio feedback depending on the speed of the ball.
 Code is [here](BallSpeed/BallSpeed.ino)
 
-
 ---
-[frist post](#frist-post)
 
-test
-This image has nothing to do with anything!
 
-![custom audio player with LED dot matrix](images/Chevelle-audio.jpg)
+## [High/Low solenoid driver](https://github.com/cedarlakeinstruments/theselittlemachines/edit/main/README.md#hi-lo)
+
+Driving solenoids is pretty easy. Just need a single digital pin and a motor or solenoid driver. Since it takes more energy to activate the
+solenoid than to keep it on, we can apply this method if we need to save power.
+We'll activate the solenoid at full power for about a quarter second (or however long it takes it to move into position, then drop
+the output level by PWM).
+
+You can download it [here](code/solenoid/solenoid.ino)
+
+![Solenoid](images/solenoid.jpg)
+
 ---
