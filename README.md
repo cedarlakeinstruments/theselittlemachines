@@ -8,7 +8,7 @@ You can download it [here](code/code.py)
 ![Thermometer](images/therm2.jpg)
 
 The desire is to display a temperature that is adjustable in 0.1 degree increments by pushbuttons. The pushbuttons are connected between Ground and GP7 & GP8.
-At least, that was the intent. However, my ham-fisted soldering connected the common to GP9 instead of GND.
+At least, that was the intent. However, my ham-fisted soldering connected the common to GP9 instead of GND. 
 
 No problem, though. We'll just turn GP9 into an output and pull it to GND. Accomplishes the same thing and I don't have to fix my wiring :-)
 
