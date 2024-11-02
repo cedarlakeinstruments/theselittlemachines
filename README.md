@@ -146,4 +146,8 @@ operator.
 Download the code [here](LiquidLevelSensor/LiquidLevelSensor.ino)
 
 Schematic diagram
+
 ![Schematic](LiquidLevelSensor/CAD/levelsensor.png)
+
+
+![Sensor photo](LiquidLevelSensor/Sensortest.jpg)
