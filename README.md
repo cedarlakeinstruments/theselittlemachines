@@ -134,3 +134,16 @@ You can download it [here](code/solenoid/solenoid.ino)
 ![Solenoid](images/solenoid.jpg)
 
 ---
+## [Liquid Level Sensor ](https://github.com/cedarlakeinstruments/theselittlemachines/edit/main/README.md#level)
+How to detect the liquid surface when filling a syrup bottle. Simple liquid level sensor senses conductivity using two food-safe
+stainless steel probes.
+An Arduino Nano drives the probes with a low-current signal, using the fluid to provide conductivity. Two analog inputs are used to detect the current flow
+through the liquid. By switching the current back and forth, we can prevent mineral buildup on the probes.
+
+When the measured signal crosses a threshold, we turn on an output to indicate that the level is detected. The output can stop a pump, or trigger an indicator to the
+operator.
+
+Download the code [here](LiquidLevelSensor/LiquidLevelSensor.ino)
+
+Schematic diagram
+![Schematic](LiquidLevelSensor/CAD/levelsensor.png)
