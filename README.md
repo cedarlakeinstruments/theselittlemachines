@@ -122,7 +122,7 @@ Code is [here](https://github.com/cedarlakeinstruments/theselittlemachines/tree/
 ---
 
 
-## [High/Low solenoid driver](https://github.com/cedarlakeinstruments/theselittlemachines/edit/main/README.md#hi-lo)
+## [High/Low solenoid driver](https://github.com/cedarlakeinstruments/theselittlemachines/main/README.md#hi-lo)
 
 Driving solenoids is pretty easy. Just need a single digital pin and a motor or solenoid driver. Since it takes more energy to activate the
 solenoid than to keep it on, we can apply this method if we need to save power.
@@ -134,7 +134,7 @@ You can download it [here](code/solenoid/solenoid.ino)
 ![Solenoid](images/solenoid.jpg)
 
 ---
-## [Liquid Level Sensor ](https://github.com/cedarlakeinstruments/theselittlemachines/edit/main/README.md#level)
+## [Liquid Level Sensor ](https://github.com/cedarlakeinstruments/theselittlemachines/main/README.md#level)
 How to detect the liquid surface when filling a syrup bottle. Simple liquid level sensor senses conductivity using two food-safe
 stainless steel probes.
 An Arduino Nano drives the probes with a low-current signal, using the fluid to provide conductivity. Two analog inputs are used to detect the current flow
