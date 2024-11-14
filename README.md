@@ -152,6 +152,6 @@ Schematic diagram
 
 ![Sensor photo](LiquidLevelSensor/Sensortest.jpg)
 
-
-
 Contact me: <littlemachines@cedarlakeinstruments.com>
+
+
